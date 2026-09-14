@@ -1,0 +1,160 @@
+// ADA Encurta — modelo de dados
+// Documentação: https://www.prisma.io/docs
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+  moduleFormat = "esm"
+  runtime = "nodejs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Campanhas
+// ---------------------------------------------------------------------------
+
+model Campaign {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  description String?
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmTerm     String?
+  utmContent  String?
+  startsAt    DateTime?
+  endsAt      DateTime?
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  links Link[]
+
+  @@index([isActive])
+  @@index([createdAt])
+  @@map("campaigns")
+}
+
+// ---------------------------------------------------------------------------
+// Links
+// ---------------------------------------------------------------------------
+
+model Link {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  originalUrl String
+  title       String?
+  description String?
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?
+
+  // UTM específicos do link (sobrescrevem os da campanha)
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmTerm     String?
+  utmContent  String?
+
+  // Contador desnormalizado para listagens rápidas (a fonte da verdade é a tabela clicks)
+  clickCount    Int       @default(0)
+  lastClickedAt DateTime?
+
+  campaignId String?
+  campaign   Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  clicks Click[]
+
+  @@index([campaignId])
+  @@index([isActive, deletedAt])
+  @@index([createdAt(sort: Desc)])
+  @@index([clickCount(sort: Desc)])
+  @@map("links")
+}
+
+// ---------------------------------------------------------------------------
+// Cliques — tabela de alto volume. Sem IP, sem user-agent bruto (LGPD).
+// ---------------------------------------------------------------------------
+
+enum DeviceType {
+  DESKTOP
+  MOBILE
+  TABLET
+  BOT
+  OTHER
+}
+
+enum RefererSource {
+  DIRECT
+  SEARCH
+  SOCIAL
+  EMAIL
+  PAID
+  REFERRAL
+  QR
+  OTHER
+}
+
+model Click {
+  id        BigInt   @id @default(autoincrement())
+  linkId    String
+  link      Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  deviceType     DeviceType    @default(OTHER)
+  browser        String?
+  browserVersion String?
+  os             String?
+  osVersion      String?
+  isBot          Boolean       @default(false)
+
+  refererHost   String?
+  refererSource RefererSource @default(DIRECT)
+
+  country String? // ISO-3166 alpha-2 (ex.: BR)
+  region  String? // ex.: SP
+  city    String?
+
+  utmSource   String?
+  utmMedium   String?
+  utmCampaign String?
+  utmTerm     String?
+  utmContent  String?
+
+  // Identificador pseudônimo e rotativo (HMAC diário de IP+UA) apenas para contar visitantes únicos.
+  visitorHash String?
+
+  @@index([linkId, createdAt(sort: Desc)])
+  @@index([createdAt(sort: Desc)])
+  @@index([linkId, visitorHash])
+  @@index([country])
+  @@index([deviceType])
+  @@index([refererSource])
+  @@map("clicks")
+}
+
+// ---------------------------------------------------------------------------
+// Auditoria
+// ---------------------------------------------------------------------------
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  actorLabel String   @default("system") // quem executou a ação (hoje: "local-admin")
+  action     String   // ex.: link.create, link.update, link.delete, campaign.create
+  entityType String   // ex.: Link, Campaign
+  entityId   String
+  metadata   Json?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt(sort: Desc)])
+  @@index([action])
+  @@map("audit_logs")
+}

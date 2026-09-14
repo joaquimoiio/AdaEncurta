@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: ada_encurta_pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ada
+      POSTGRES_PASSWORD: ada_dev_password
+      POSTGRES_DB: ada_encurta
+    ports:
+      - "5434:5432"
+    volumes:
+      - ada_encurta_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ada -d ada_encurta"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: ada_encurta_redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
+    ports:
+      - "6380:6379"
+    volumes:
+      - ada_encurta_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Aplicação (opcional para rodar tudo em containers):
+  #   docker compose --profile app up --build
+  app:
+    profiles: ["app"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: ada_encurta_app
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://ada:ada_dev_password@postgres:5432/ada_encurta?schema=public
+      REDIS_URL: redis://redis:6379
+      APP_URL: http://localhost:3000
+      SHORT_BASE_URL: http://localhost:3000
+      HASH_SECRET: change-me-in-production-please
+    ports:
+      - "3000:3000"
+
+volumes:
+  ada_encurta_pg_data:
+  ada_encurta_redis_data:

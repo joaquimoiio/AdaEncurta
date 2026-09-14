@@ -1,0 +1,172 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-sans);
+  --color-ada-orange: var(--ada-orange);
+  --color-ada-orange-dark: var(--ada-orange-dark);
+  --color-ada-orange-soft: var(--ada-orange-soft);
+  --color-ada-orange-soft-2: var(--ada-orange-soft-2);
+  --color-ada-peach: var(--ada-peach);
+  --color-ada-green: var(--ada-green);
+  --color-ada-green-2: var(--ada-green-2);
+  --color-ada-brown: var(--ada-brown);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ---------------------------------------------------------------------------
+   Identidade visual ADA Nutracêuticos (adanutraceuticos.com.br)
+   - Primária: laranja #ED6931 (logo)
+   - Escuro: verde #002320 · marrom #362017
+   - Suaves: pêssego #FFF6F2 · laranja claro #EDAF8B
+   - Apoio: verde #108474
+   - Fonte: Sora
+   --------------------------------------------------------------------------- */
+:root {
+  --ada-orange: #ed6931;
+  --ada-orange-dark: #c53900;
+  --ada-orange-soft: #fff6f2;
+  --ada-orange-soft-2: #ffe5d9;
+  --ada-peach: #edaf8b;
+  --ada-green: #002320;
+  --ada-green-2: #108474;
+  --ada-brown: #362017;
+
+  --background: #fffaf7;
+  --foreground: #002320;
+  --card: #ffffff;
+  --card-foreground: #002320;
+  --popover: #ffffff;
+  --popover-foreground: #002320;
+  --primary: #ed6931;
+  --primary-foreground: #ffffff;
+  --secondary: #fff6f2;
+  --secondary-foreground: #362017;
+  --muted: #f6efeb;
+  --muted-foreground: #6f625b;
+  --accent: #fff6f2;
+  --accent-foreground: #c53900;
+  --destructive: #dc2626;
+  --border: #efe3dc;
+  --input: #efe3dc;
+  --ring: #edaf8b;
+  --chart-1: #ed6931;
+  --chart-2: #108474;
+  --chart-3: #edaf8b;
+  --chart-4: #362017;
+  --chart-5: #002320;
+  --radius: 0.75rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #362017;
+  --sidebar-primary: #ed6931;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fff6f2;
+  --sidebar-accent-foreground: #c53900;
+  --sidebar-border: #efe3dc;
+  --sidebar-ring: #edaf8b;
+}
+
+.dark {
+  --background: #12100f;
+  --foreground: #fbf3ee;
+  --card: #1b1816;
+  --card-foreground: #fbf3ee;
+  --popover: #1b1816;
+  --popover-foreground: #fbf3ee;
+  --primary: #f07b48;
+  --primary-foreground: #1b0d06;
+  --secondary: #2a2420;
+  --secondary-foreground: #fbf3ee;
+  --muted: #2a2420;
+  --muted-foreground: #b8a9a0;
+  --accent: #3a2418;
+  --accent-foreground: #ffc9ad;
+  --destructive: #f87171;
+  --border: rgb(255 255 255 / 10%);
+  --input: rgb(255 255 255 / 15%);
+  --ring: #ed6931;
+  --chart-1: #f07b48;
+  --chart-2: #2fb59f;
+  --chart-3: #edaf8b;
+  --chart-4: #b8a9a0;
+  --chart-5: #7fd1c0;
+  --sidebar: #171412;
+  --sidebar-foreground: #ede2dc;
+  --sidebar-primary: #f07b48;
+  --sidebar-primary-foreground: #1b0d06;
+  --sidebar-accent: #3a2418;
+  --sidebar-accent-foreground: #ffc9ad;
+  --sidebar-border: rgb(255 255 255 / 10%);
+  --sidebar-ring: #ed6931;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  button:not(:disabled), [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    @apply font-sans;
+  }
+}
+@layer base {
+  body {
+    font-feature-settings: "ss01", "cv11";
+  }
+  h1, h2, h3, h4 {
+    letter-spacing: -0.01em;
+  }
+}
+
+@layer utilities {
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
