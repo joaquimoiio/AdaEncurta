@@ -15,6 +15,11 @@ const envSchema = z.object({
   RATE_LIMIT_API_PER_MINUTE: z.coerce.number().int().positive().default(60),
   REDIRECT_CACHE_TTL_SECONDS: z.coerce.number().int().positive().default(3600),
   ALLOWED_DESTINATION_HOSTS: z.string().default(""),
+  // Interruptor do MCP: desligado (padrão) => a API recusa qualquer requisição vinda do MCP.
+  MCP_ENABLED: z
+    .string()
+    .default("false")
+    .transform((v) => v === "true" || v === "1"),
   GEOIP_ENABLED: z
     .string()
     .default("true")

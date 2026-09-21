@@ -37,6 +37,8 @@ export const createLinkSchema = utmSchema.extend({
   description: z.preprocess(emptyToNull, z.string().trim().max(500).optional().nullable()),
   campaignId: z.preprocess(emptyToNull, z.string().max(64).optional().nullable()),
   expiresAt: optionalDate,
+  inactiveTitle: z.preprocess(emptyToNull, z.string().trim().max(120).optional().nullable()),
+  inactiveMessage: z.preprocess(emptyToNull, z.string().trim().max(500).optional().nullable()),
   isActive: z.boolean().optional().default(true),
 });
 

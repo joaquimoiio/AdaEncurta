@@ -142,6 +142,29 @@ describe("Acessar URL curta → redirecionar e registrar clique", () => {
     expect(await prisma.click.count({ where: { linkId: { in: [l1.id, l2.id] } } })).toBe(0);
   });
 
+  it("link desativado guarda título/mensagem personalizados e a página recebe o código", async () => {
+    const code = testCode("inmsg");
+    const link = await createLink({ originalUrl: "https://example.com/m", code, isActive: true }, testActor);
+    const updated = await updateLink(
+      link.id,
+      { isActive: false, inactiveTitle: "Promoção encerrada", inactiveMessage: "Veja as novidades no site." },
+      testActor,
+    );
+    expect(updated.inactiveTitle).toBe("Promoção encerrada");
+    expect(updated.inactiveMessage).toBe("Veja as novidades no site.");
+
+    const res = await hit(code);
+    const location = new URL(res.headers.get("location")!);
+    expect(location.pathname).toBe("/link-indisponivel");
+    expect(location.searchParams.get("motivo")).toBe("inactive");
+    expect(location.searchParams.get("c")).toBe(code);
+
+    // Campos vazios voltam ao texto padrão
+    const cleared = await updateLink(link.id, { inactiveTitle: null, inactiveMessage: null }, testActor);
+    expect(cleared.inactiveTitle).toBeNull();
+    expect(cleared.inactiveMessage).toBeNull();
+  });
+
   it("aplica rate limit por IP no redirect", async () => {
     const code = testCode("rl");
     await createLink({ originalUrl: "https://example.com/rl", code, isActive: true }, testActor);

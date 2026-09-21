@@ -30,8 +30,11 @@ export async function GET(req: Request, ctx: RouteContext<"/[code]">) {
   const result = await resolveLink(code, url.searchParams);
 
   if (result.status !== "ok") {
-    const reason = result.status;
-    return NextResponse.redirect(new URL(`/link-indisponivel?motivo=${reason}`, getEnv().APP_URL), {
+    const target = new URL("/link-indisponivel", getEnv().APP_URL);
+    target.searchParams.set("motivo", result.status);
+    // A página consulta o código para exibir a mensagem personalizada de link desativado.
+    if (result.status === "inactive") target.searchParams.set("c", code);
+    return NextResponse.redirect(target, {
       status: 302,
       headers: { "Cache-Control": "no-store" },
     });

@@ -54,8 +54,20 @@ GET /{codigo}
 
 - **Painel**: `/admin` (dashboard), `/admin/links`, `/admin/campanhas`, `/admin/relatorios`.
 - **API**: `/api/links`, `/api/links/:id`, `/api/links/:id/stats`, `/api/links/:id/qrcode`, `/api/campaigns`, `/api/dashboard`, `/api/reports/export`, `/api/health`.
-- Links inativos/expirados/inexistentes redirecionam para `/link-indisponivel`.
+- Links inativos/expirados/inexistentes redirecionam para `/link-indisponivel`. Ao desativar um link, o painel abre um popup para personalizar o **título** e a **mensagem** exibidos aos visitantes (em branco = texto padrão).
 - O cache do redirect é invalidado ao editar/excluir um link ou alterar a campanha dele.
+
+### MCP (Claude Code / Claude Desktop)
+
+`mcp/` é um servidor MCP (stdio) que usa **somente a API HTTP** do app. Com o app rodando (`pnpm dev`):
+
+```bash
+claude mcp add ada-encurta -e ADA_API_URL=http://localhost:3000 -- pnpm --dir /caminho/para/AdaEncurta mcp
+```
+
+Tools: `list/get/create/update_campaign`, `list/get/create/update_link`, `create_links_for_channels` (um link por canal com UTMs próprios), `deactivate_link` (com título/mensagem personalizados), `activate_link`, `get_link_qrcode`, `get_link_stats`, `get_campaign_report`, `get_dashboard`, `export_report` (CSV).
+**Interruptor:** o MCP só funciona com `MCP_ENABLED=true` no `.env` do app (padrão: `false`). Desligado, a API responde 403 a toda requisição do MCP (identificada pelo header `X-Ada-Client: mcp`) e todas as tools retornam erro. Reinicie o app após mudar o valor.
+Os valores de UTM são normalizados (minúsculas, sem acento, hífens) para os relatórios não fragmentarem. A API não tem autenticação; não exponha o app publicamente sem uma camada de proteção.
 
 ### Estrutura
 

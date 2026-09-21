@@ -52,6 +52,10 @@ model Link {
   isActive    Boolean   @default(true)
   expiresAt   DateTime?
 
+  // Mensagem exibida quando o link está desativado (null = texto padrão)
+  inactiveTitle   String?
+  inactiveMessage String?
+
   // UTM específicos do link (sobrescrevem os da campanha)
   utmSource   String?
   utmMedium   String?

@@ -57,6 +57,8 @@ export async function createLink(input: CreateLinkInput, actor: Actor) {
       campaignId: input.campaignId ?? null,
       expiresAt: input.expiresAt ?? null,
       isActive: input.isActive ?? true,
+      inactiveTitle: input.inactiveTitle ?? null,
+      inactiveMessage: input.inactiveMessage ?? null,
       utmSource: input.utmSource ?? null,
       utmMedium: input.utmMedium ?? null,
       utmCampaign: input.utmCampaign ?? null,
@@ -95,6 +97,8 @@ export async function updateLink(id: string, input: UpdateLinkInput, actor: Acto
   if (input.description !== undefined) data.description = input.description;
   if (input.expiresAt !== undefined) data.expiresAt = input.expiresAt;
   if (input.isActive !== undefined) data.isActive = input.isActive;
+  if (input.inactiveTitle !== undefined) data.inactiveTitle = input.inactiveTitle;
+  if (input.inactiveMessage !== undefined) data.inactiveMessage = input.inactiveMessage;
   if (input.campaignId !== undefined) {
     data.campaign = input.campaignId ? { connect: { id: input.campaignId } } : { disconnect: true };
   }

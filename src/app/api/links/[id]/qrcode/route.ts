@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { errorResponse, parseQuery } from "@/lib/api";
+import { assertMcpAllowed, errorResponse, parseQuery } from "@/lib/api";
 import { getLinkById } from "@/server/links";
 import { generateQrCode } from "@/server/qrcode";
 
@@ -21,6 +21,7 @@ const querySchema = z.object({
 /** GET /api/links/:id/qrcode?format=png|svg&size=512&download=1&utm=1 */
 export async function GET(req: Request, ctx: RouteContext<"/api/links/[id]/qrcode">) {
   try {
+    assertMcpAllowed(req);
     const { id } = await ctx.params;
     const q = parseQuery(req, querySchema);
     const link = await getLinkById(id);
