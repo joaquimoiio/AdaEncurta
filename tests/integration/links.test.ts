@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { prisma } from "@/lib/prisma";
 import { GET as listLinksRoute, POST as createLinkRoute } from "@/app/api/links/route";
 import { DELETE as deleteLinkRoute, GET as getLinkRoute, PATCH as patchLinkRoute } from "@/app/api/links/[id]/route";
@@ -119,5 +119,33 @@ describe("Criar link (API)", () => {
     expect(svg.headers.get("content-type")).toBe("image/svg+xml");
     expect(svg.headers.get("content-disposition")).toContain(`qrcode-${link.code}.svg`);
     expect(await svg.text()).toContain("<svg");
+  });
+});
+
+describe("Interruptor do MCP (MCP_ENABLED)", () => {
+  const original = process.env.MCP_ENABLED;
+  afterAll(() => {
+    if (original === undefined) delete process.env.MCP_ENABLED;
+    else process.env.MCP_ENABLED = original;
+    vi.resetModules();
+  });
+
+  async function listAs(client: "mcp" | null, enabled: string) {
+    process.env.MCP_ENABLED = enabled;
+    vi.resetModules();
+    const { GET } = await import("@/app/api/links/route");
+    const headers: Record<string, string> = client ? { "x-ada-client": client } : {};
+    return GET(makeRequest(`${ORIGIN}/api/links`, { headers }), routeCtx({}));
+  }
+
+  it("bloqueia (403) o MCP quando desativado, mas não a API normal", async () => {
+    const blocked = await listAs("mcp", "false");
+    expect(blocked.status).toBe(403);
+    expect((await blocked.json()).error).toMatch(/MCP está desativado/);
+    expect((await listAs(null, "false")).status).toBe(200);
+  });
+
+  it("libera o MCP quando MCP_ENABLED=true", async () => {
+    expect((await listAs("mcp", "true")).status).toBe(200);
   });
 });

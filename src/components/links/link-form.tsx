@@ -27,6 +27,8 @@ type FormState = {
   campaignId: string;
   expiresAt: string;
   isActive: boolean;
+  inactiveTitle: string;
+  inactiveMessage: string;
   utmSource: string;
   utmMedium: string;
   utmCampaign: string;
@@ -45,6 +47,8 @@ function toState(link?: SerializedLink): FormState {
     campaignId: link?.campaignId ?? NONE,
     expiresAt: link?.expiresAt ? toDateInputValue(new Date(link.expiresAt)) : "",
     isActive: link?.isActive ?? true,
+    inactiveTitle: link?.inactiveTitle ?? "",
+    inactiveMessage: link?.inactiveMessage ?? "",
     utmSource: link?.utmSource ?? "",
     utmMedium: link?.utmMedium ?? "",
     utmCampaign: link?.utmCampaign ?? "",
@@ -91,6 +95,8 @@ export function LinkForm({
       campaignId: state.campaignId === NONE ? null : state.campaignId,
       expiresAt: state.expiresAt ? new Date(`${state.expiresAt}T23:59:59`).toISOString() : null,
       isActive: state.isActive,
+      inactiveTitle: state.inactiveTitle || null,
+      inactiveMessage: state.inactiveMessage || null,
       utmSource: state.utmSource || null,
       utmMedium: state.utmMedium || null,
       utmCampaign: state.utmCampaign || null,
@@ -252,6 +258,30 @@ export function LinkForm({
               </div>
               <Switch id="isActive" checked={state.isActive} onCheckedChange={(v) => set("isActive", v)} />
             </div>
+            {!state.isActive ? (
+              <div className="grid gap-4 rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground">Mensagem exibida aos visitantes. Em branco, usa o texto padrão.</p>
+                <Field label="Título" htmlFor="inactiveTitle" error={errors.inactiveTitle}>
+                  <Input
+                    id="inactiveTitle"
+                    placeholder="Link desativado"
+                    value={state.inactiveTitle}
+                    onChange={(e) => set("inactiveTitle", e.target.value)}
+                    maxLength={120}
+                  />
+                </Field>
+                <Field label="Mensagem" htmlFor="inactiveMessage" error={errors.inactiveMessage}>
+                  <Textarea
+                    id="inactiveMessage"
+                    rows={3}
+                    placeholder="Este link foi desativado e não está mais redirecionando."
+                    value={state.inactiveMessage}
+                    onChange={(e) => set("inactiveMessage", e.target.value)}
+                    maxLength={500}
+                  />
+                </Field>
+              </div>
+            ) : null}
           </CardContent>
         </Card>
 

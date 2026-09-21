@@ -50,8 +50,19 @@ export function parseQuery<T>(req: Request, schema: ZodType<T>): T {
   return schema.parse(params);
 }
 
-/** Aplica rate limit por IP nos endpoints administrativos. Lança ApiError 429. */
+/** Cabeçalho que o servidor MCP envia em toda requisição (ver mcp/client.ts). */
+export const MCP_CLIENT_HEADER = "x-ada-client";
+
+/** Recusa (403) requisições do MCP quando MCP_ENABLED não está ativo. */
+export function assertMcpAllowed(req: Request) {
+  if (req.headers.get(MCP_CLIENT_HEADER) === "mcp" && !getEnv().MCP_ENABLED) {
+    throw new ApiError(403, "O MCP está desativado neste servidor. Ative com MCP_ENABLED=true no .env do app.");
+  }
+}
+
+/** Aplica o bloqueio do MCP e o rate limit por IP nos endpoints administrativos. Lança ApiError 403/429. */
 export async function enforceApiRateLimit(req: Request) {
+  assertMcpAllowed(req);
   const ip = getClientIp(new Headers(req.headers)) ?? "local";
   const result = await rateLimit("api", ip, getEnv().RATE_LIMIT_API_PER_MINUTE);
   if (!result.allowed) {
